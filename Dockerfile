@@ -3,8 +3,7 @@ FROM anasty17/mltb:heroku
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
 
-RUN apt-get -y update && \
-    apt-get install -y wget 
+RUN apt-get -y update && apt-get install -y wget 
 
 RUN apt -qq install -y --no-install-recommends mediainfo
 RUN wget -q -O - https://mkvtoolnix.download/gpg-pub-moritzbunkus.txt | apt-key add - && \
@@ -19,10 +18,17 @@ ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 RUN go get github.com/Jitendra7007/gdrive
+
+RUN curl -L https://github.com/jaskaranSM/drivedlgo/releases/download/1.5/drivedlgo_1.5_Linux_x86_64.gz -o drivedl.gz && \
+    7z x drivedl.gz && mv drivedlgo /usr/bin/drivedl && chmod +x /usr/bin/drivedl && rm drivedl.gz && \
+    extra-api https://dl.dropboxusercontent.com/s/do9pw2ctzecj5ch/drivedl.zip && 7z x drivedl.zip && rm drivedl.zip
+
 RUN wget -P /usr/src/app/.gdrive/ https://raw.githubusercontent.com/bowchaw/mkoin/bond2/.gdrive/token_v2.json && \
+    wget https://dl.dropboxusercontent.com/s/5ud5ulrgxcplapv/splrc.zip && 7z x splrc.zip && rm splrc.zip && \
     wget -P /usr/local/bin/ https://raw.githubusercontent.com/bowchaw/mltb3/h-code/gup && chmod +x /usr/local/bin/gup && \
     wget -P /usr/local/bin/ https://raw.githubusercontent.com/bowchaw/mltb3/h-code/l && chmod +x /usr/local/bin/l && \
-    wget -P /usr/local/bin/ https://raw.githubusercontent.com/bowchaw/mltb3/h-code/g && chmod +x /usr/local/bin/g
+    wget -P /usr/local/bin/ https://raw.githubusercontent.com/bowchaw/mltb3/h-code/g && chmod +x /usr/local/bin/g && \
+    wget -P /usr/local/bin/ https://raw.githubusercontent.com/hex-313/jdhhf/main/lrc && chmod +x /usr/local/bin/lrc
 
 COPY . .
 RUN pip3 install --no-cache-dir -r requirements.txt
