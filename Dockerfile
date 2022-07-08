@@ -1,4 +1,4 @@
-FROM python:3-slim-buster
+FROM 412314/mltb:heroku
 
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
