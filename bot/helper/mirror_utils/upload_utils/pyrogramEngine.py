@@ -7,7 +7,7 @@ from threading import RLock
 from pyrogram import Client, enums
 
 from bot import DOWNLOAD_DIR, AS_DOCUMENT, AS_DOC_USERS, AS_MEDIA_USERS, CUSTOM_FILENAME, \
-                 EXTENTION_FILTER, app
+                 EXTENTION_FILTER, app, rss_session
 from bot.helper.ext_utils.fs_utils import take_ss, get_media_info, get_video_resolution, get_path_size
 from bot.helper.ext_utils.bot_utils import get_readable_file_size
 
@@ -36,6 +36,7 @@ class TgUploader:
         self.__corrupted = 0
         self.__resource_lock = RLock()
         self.__is_corrupted = False
+        self.chat = self.__listener.message.chat.id
         self.__sent_msg = app.get_messages(self.__listener.message.chat.id, self.__listener.uid)
         self.__user_settings()
 
@@ -96,33 +97,33 @@ class TgUploader:
                         new_path = ospath.join(dirpath, file_)
                         osrename(up_path, new_path)
                         up_path = new_path
-                    self.__sent_msg = self.__sent_msg.reply_video(video=up_path,
-                                                                  quote=True,
-                                                                  caption=cap_mono,
-                                                                  duration=duration,
-                                                                  width=width,
-                                                                  height=height,
-                                                                  thumb=thumb,
-                                                                  supports_streaming=True,
-                                                                  disable_notification=True,
-                                                                  progress=self.__upload_progress)
+                    self.__sent_msg = rss_session.send_video(chat_id=self.chat,
+                                                             video=up_path,
+                                                             caption=cap_mono,
+                                                             duration=duration,
+                                                             width=width,
+                                                             height=height,
+                                                             thumb=thumb,
+                                                             supports_streaming=True,
+                                                             disable_notification=True,
+                                                             progress=self.__upload_progress)
                 elif file_.upper().endswith(AUDIO_SUFFIXES):
                     duration , artist, title = get_media_info(up_path)
-                    self.__sent_msg = self.__sent_msg.reply_audio(audio=up_path,
-                                                                  quote=True,
-                                                                  caption=cap_mono,
-                                                                  duration=duration,
-                                                                  performer=artist,
-                                                                  title=title,
-                                                                  thumb=thumb,
-                                                                  disable_notification=True,
-                                                                  progress=self.__upload_progress)
+                    self.__sent_msg = rss_session.send_audio(chat_id=self.chat,
+                                                             audio=up_path,
+                                                             caption=cap_mono,
+                                                             duration=duration,
+                                                             performer=artist,
+                                                             title=title,
+                                                             thumb=thumb,
+                                                             disable_notification=True,
+                                                             progress=self.__upload_progress)
                 elif file_.upper().endswith(IMAGE_SUFFIXES):
-                    self.__sent_msg = self.__sent_msg.reply_photo(photo=up_path,
-                                                                  quote=True,
-                                                                  caption=cap_mono,
-                                                                  disable_notification=True,
-                                                                  progress=self.__upload_progress)
+                    self.__sent_msg = rss_session.send_photo(chat_id=self.chat,
+                                                             photo=up_path,
+                                                             caption=cap_mono,
+                                                             disable_notification=True,
+                                                             progress=self.__upload_progress)
                 else:
                     notMedia = True
             if self.__as_doc or notMedia:
@@ -132,12 +133,12 @@ class TgUploader:
                         if self.__thumb is None and thumb is not None and ospath.lexists(thumb):
                             osremove(thumb)
                         return
-                self.__sent_msg = self.__sent_msg.reply_document(document=up_path,
-                                                                 quote=True,
-                                                                 thumb=thumb,
-                                                                 caption=cap_mono,
-                                                                 disable_notification=True,
-                                                                 progress=self.__upload_progress)
+                self.__sent_msg = rss_session.send_document(chat_id=self.chat,
+                                                            document=up_path,
+                                                            thumb=thumb,
+                                                            caption=cap_mono,
+                                                            disable_notification=True,
+                                                            progress=self.__upload_progress)
         except FloodWait as f:
             LOGGER.warning(str(f))
             sleep(f.value)
