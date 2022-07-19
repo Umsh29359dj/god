@@ -1,4 +1,4 @@
-FROM python:3-slim-buster
+FROM 412314/mltb:heroku
 
 # Install all the required packages
 WORKDIR /usr/src/app
