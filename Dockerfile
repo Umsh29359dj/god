@@ -29,10 +29,7 @@ RUN apt-get update && apt-get install -y software-properties-common && \
     # install extraction tools
     p7zip-full p7zip-rar rar unrar zip unzip \
     # miscellaneous helpers
-    megatools mediainfo && \
-    # clean up the container "layer", after we are done
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
+    megatools mediainfo && 
 RUN wget https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz && \
     tar xvf ffmpeg*.xz && \
     cd ffmpeg-*-static && \
